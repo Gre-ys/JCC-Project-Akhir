@@ -68,5 +68,6 @@ Route.post("/otp-verification", "AuthController.otp_verification").as(
   "auth.verify"
 );
 Route.post("/register", "AuthController.register").as("auth.register");
-Route.post("/login", "AuthController.login").as("auth.login");
-// .middleware(["verify"]);
+Route.post("/login", "AuthController.login")
+  .as("auth.login")
+  .middleware(["verify"]);
