@@ -19,55 +19,56 @@
 */
 
 import Route from "@ioc:Adonis/Core/Route";
-import BookingsController from "App/Controllers/Http/BookingsController";
 
 Route.get("/", async () => {
   return { hello: "world" };
 });
 
-// Route Venues
-Route.resource("venues", "VenuesController")
-  .apiOnly()
-  .middleware({ "*": ["auth", "acl:owner"] });
+Route.group(() => {
+  // Routes Venues
+  Route.resource("venues", "VenuesController")
+    .apiOnly()
+    .middleware({ "*": ["auth", "acl:owner"] });
 
-// Route Fields
-Route.resource("venues.fields", "FieldsController")
-  .apiOnly()
-  .middleware({ "*": ["auth", "acl:owner"] });
+  // Routes Fields
+  Route.resource("venues.fields", "FieldsController")
+    .apiOnly()
+    .middleware({ "*": ["auth", "acl:owner"] });
 
-//Bookings
-Route.post("/fields/:field_id/bookings", "BookingsController.store")
-  .as("bookings.store")
-  .middleware(["auth", "acl:user"]);
+  // Routes Bookings
+  Route.post("/fields/:field_id/bookings", "BookingsController.store") // Ini adalah Routes venues/id/bookings dirumah ke field agar lebih masuk akal(karena yang disewa fieldnya)
+    .as("bookings.store")
+    .middleware(["auth", "acl:user"]);
 
-Route.get("/fields/:id", "BookingsController.showBookings")
-  .as("fields.bookings.showBookings")
-  .middleware(["auth", "acl:user"]);
+  Route.get("/fields/:id", "BookingsController.showBookings")
+    .as("fields.bookings.showBookings")
+    .middleware(["auth", "acl:user"]);
 
-Route.resource("bookings", "BookingsController")
-  .apiOnly()
-  .middleware({
-    "*": ["auth", "acl:user"],
-  })
-  .except(["store"]);
+  Route.resource("bookings", "BookingsController")
+    .apiOnly()
+    .middleware({
+      "*": ["auth", "acl:user"],
+    })
+    .except(["store"]);
 
-Route.post("/bookings/:id/join", "BookingsController.join")
-  .as("bookings.join")
-  .middleware(["auth", "acl:user"]);
+  Route.post("/bookings/:id/join", "BookingsController.join")
+    .as("bookings.join")
+    .middleware(["auth", "acl:user"]);
 
-Route.post("/bookings/:id/unjoin", "BookingsController.unjoin")
-  .as("bookings.unjoin")
-  .middleware(["auth", "acl:user"]);
+  Route.post("/bookings/:id/unjoin", "BookingsController.unjoin")
+    .as("bookings.unjoin")
+    .middleware(["auth", "acl:user"]);
 
-Route.get("/schedules", "BookingsController.schedules")
-  .as("bookings.schedules")
-  .middleware(["auth", "acl:user"]);
+  Route.get("/schedules", "BookingsController.schedules")
+    .as("bookings.schedules")
+    .middleware(["auth", "acl:user"]);
 
-// Auth
-Route.post("/otp-verification", "AuthController.otp_verification").as(
-  "auth.verify"
-);
-Route.post("/register", "AuthController.register").as("auth.register");
-Route.post("/login", "AuthController.login")
-  .as("auth.login")
-  .middleware(["verify"]);
+  // Routes Auth
+  Route.post("/otp-verification", "AuthController.otp_verification").as(
+    "auth.verify"
+  );
+  Route.post("/register", "AuthController.register").as("auth.register");
+  Route.post("/login", "AuthController.login")
+    .as("auth.login")
+    .middleware(["verify"]);
+}).prefix("/api/v1");
